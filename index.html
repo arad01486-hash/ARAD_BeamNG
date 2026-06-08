@@ -3,15 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD BeamNG PRO DASHBOARD</title>
+<title>ARAD BeamNG GOD MODE</title>
 
 <style>
-body{
-margin:0;
-font-family:tahoma;
-background:#0a0f1f;
-color:white;
-}
+body{margin:0;font-family:tahoma;background:#0a0f1f;color:white}
 
 /* LOGIN */
 #login{
@@ -48,7 +43,6 @@ grid-template-columns:220px 1fr;
 display:grid;
 }
 
-/* SIDEBAR */
 .sidebar{
 background:#111827;
 padding:15px;
@@ -56,29 +50,20 @@ display:flex;
 flex-direction:column;
 }
 
-.sidebar button{
-margin:5px 0;
-}
+.sidebar button{margin:5px 0}
 
-/* MAIN */
 .main{
 padding:20px;
 overflow:auto;
-}
-
-.cards{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:15px;
 }
 
 .card{
 background:#1e293b;
 padding:15px;
 border-radius:12px;
+margin:10px;
 }
 
-/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -97,15 +82,18 @@ width:100%;
 border-radius:10px;
 }
 
-.del{
-position:absolute;
-top:5px;
-left:5px;
-background:red;
-color:white;
+.small{
+font-size:12px;
+opacity:.7;
+}
+
+.like{
+background:#00e5ff;
 border:none;
-border-radius:5px;
+padding:5px;
+border-radius:6px;
 cursor:pointer;
+margin-top:5px;
 }
 </style>
 </head>
@@ -114,56 +102,51 @@ cursor:pointer;
 
 <!-- LOGIN -->
 <div id="login">
-<h2>🔐 Login</h2>
+<h2>🔐 GOD LOGIN</h2>
 <input id="email" placeholder="Email">
 <input id="pass" type="password" placeholder="Password">
 <button class="btn" onclick="login()">Login</button>
 </div>
 
-<!-- DASHBOARD -->
+<!-- DASH -->
 <div id="dash">
 
-<!-- SIDEBAR -->
 <div class="sidebar">
-<h3>🚗 ARAD PANEL</h3>
-
+<h3>🚗 GOD PANEL</h3>
 <button class="btn" onclick="show('home')">🏠 داشبورد</button>
 <button class="btn" onclick="show('upload')">📤 آپلود</button>
 <button class="btn" onclick="show('gallery')">🖼️ گالری</button>
 <button class="btn" onclick="logout()">🚪 خروج</button>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 
 <!-- HOME -->
 <div id="home">
-<h2>📊 داشبورد</h2>
+<h2>📊 GOD DASHBOARD</h2>
 
-<div class="cards">
 <div class="card">
-<h3 id="count">0</h3>
-<p>تعداد فایل‌ها</p>
+<h2 id="count">0</h2>
+<p>📦 تعداد پست‌ها</p>
 </div>
 
 <div class="card">
-<h3>🔥 LIVE</h3>
-<p>سایت آنلاین</p>
-</div>
+<h2 id="likesTotal">0</h2>
+<p>❤️ مجموع لایک‌ها</p>
 </div>
 
 </div>
 
 <!-- UPLOAD -->
 <div id="upload" style="display:none">
-<h2>📤 آپلود فایل</h2>
+<h2>📤 Upload</h2>
 <input type="file" id="file">
-<button class="btn" onclick="upload()">آپلود</button>
+<button class="btn" onclick="upload()">Upload</button>
 </div>
 
 <!-- GALLERY -->
 <div id="gallery" style="display:none">
-<h2>🖼️ گالری</h2>
+<h2>🖼️ GOD GALLERY</h2>
 <div class="grid" id="galleryBox"></div>
 </div>
 
@@ -179,7 +162,7 @@ from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -191,8 +174,6 @@ const firebaseConfig = {
   appId: "1:259621342630:web:8640e6c867e38980abd367"
 };
 
-const ADMIN_EMAIL = "admin@gmail.com"; // 👑 ایمیل خودت رو اینجا بزن
-
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
@@ -200,10 +181,11 @@ const db = getFirestore(app);
 
 /* LOGIN */
 window.login = async function(){
-const email = document.getElementById("email").value;
-const pass = document.getElementById("pass").value;
-
-await signInWithEmailAndPassword(auth,email,pass);
+await signInWithEmailAndPassword(
+auth,
+document.getElementById("email").value,
+document.getElementById("pass").value
+);
 }
 
 /* LOGOUT */
@@ -224,61 +206,66 @@ document.getElementById("dash").style.display="none";
 });
 
 /* NAV */
-window.show = function(page){
-document.getElementById("home").style.display="none";
-document.getElementById("upload").style.display="none";
-document.getElementById("gallery").style.display="none";
-
-document.getElementById(page).style.display="block";
-
-if(page==="gallery") loadGallery();
+window.show = function(p){
+home.style.display="none";
+upload.style.display="none";
+gallery.style.display="none";
+document.getElementById(p).style.display="block";
 }
 
 /* UPLOAD */
 window.upload = async function(){
-const file = document.getElementById("file").files[0];
+const file=document.getElementById("file").files[0];
 
-const fileRef = ref(storage,"uploads/"+file.name);
+const fileRef=ref(storage,"uploads/"+file.name);
 await uploadBytes(fileRef,file);
-
-const url = await getDownloadURL(fileRef);
+const url=await getDownloadURL(fileRef);
 
 await addDoc(collection(db,"gallery"),{
 url:url,
-name:file.name
+name:file.name,
+likes:0,
+views:0
 });
 
 loadGallery();
-alert("Uploaded 🚀");
 }
 
-/* LOAD GALLERY */
+/* LOAD */
 async function loadGallery(){
-const snap = await getDocs(collection(db,"gallery"));
+const snap=await getDocs(collection(db,"gallery"));
 
-const box = document.getElementById("galleryBox");
+let box=document.getElementById("galleryBox");
 box.innerHTML="";
-let count = 0;
+
+let totalLikes=0;
+let count=0;
 
 snap.forEach(d=>{
-const data = d.data();
+const data=d.data();
 count++;
+totalLikes+=data.likes || 0;
 
-box.innerHTML += `
+box.innerHTML+=`
 <div class="item">
-<button class="del" onclick="del('${d.id}')">X</button>
 <img src="${data.url}">
 <p>${data.name}</p>
+<p class="small">❤️ ${data.likes || 0} | 👁️ ${data.views || 0}</p>
+<button class="like" onclick="like('${d.id}',${data.likes||0})">Like</button>
 </div>
 `;
 });
 
-document.getElementById("count").innerText = count;
+countEl.innerText=count;
+likesTotal.innerText=totalLikes;
 }
 
-/* DELETE */
-window.del = async function(id){
-await deleteDoc(doc(db,"gallery",id));
+/* LIKE */
+window.like = async function(id,likes){
+const refDoc=doc(db,"gallery",id);
+await updateDoc(refDoc,{
+likes:likes+1
+});
 loadGallery();
 }
 
