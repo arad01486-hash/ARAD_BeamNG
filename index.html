@@ -1,272 +1,217 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD BeamNG GOD MODE</title>
+<title>ARAD STORE SAFE</title>
 
 <style>
-body{margin:0;font-family:tahoma;background:#0a0f1f;color:white}
-
-/* LOGIN */
-#login{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-}
-
-input{
-padding:10px;
-margin:5px;
-border:none;
-border-radius:10px;
-width:220px;
-}
-
-.btn{
-padding:10px 15px;
-background:#00e5ff;
-color:black;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-}
-
-/* DASHBOARD */
-#dash{
-display:none;
-height:100vh;
-grid-template-columns:220px 1fr;
-display:grid;
-}
-
-.sidebar{
-background:#111827;
-padding:15px;
-display:flex;
-flex-direction:column;
-}
-
-.sidebar button{margin:5px 0}
-
-.main{
-padding:20px;
-overflow:auto;
+body{
+margin:0;
+font-family:tahoma;
+background:#0b0b0b;
+color:white;
+text-align:center;
+direction:rtl;
 }
 
 .card{
-background:#1e293b;
+background:#1a1a1a;
 padding:15px;
-border-radius:12px;
 margin:10px;
+border-radius:10px;
+display:inline-block;
+width:300px;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:10px;
-}
-
-.item{
-background:#1e293b;
+button,input{
 padding:10px;
-border-radius:10px;
-position:relative;
-}
-
-.item img{
-width:100%;
-border-radius:10px;
-}
-
-.small{
-font-size:12px;
-opacity:.7;
-}
-
-.like{
-background:#00e5ff;
-border:none;
-padding:5px;
-border-radius:6px;
-cursor:pointer;
-margin-top:5px;
+margin:5px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-<h2>🔐 GOD LOGIN</h2>
-<input id="email" placeholder="Email">
-<input id="pass" type="password" placeholder="Password">
-<button class="btn" onclick="login()">Login</button>
-</div>
+<div id="app"></div>
 
-<!-- DASH -->
-<div id="dash">
+<script>
+/* ================= SAFE CORE ================= */
 
-<div class="sidebar">
-<h3>🚗 GOD PANEL</h3>
-<button class="btn" onclick="show('home')">🏠 داشبورد</button>
-<button class="btn" onclick="show('upload')">📤 آپلود</button>
-<button class="btn" onclick="show('gallery')">🖼️ گالری</button>
-<button class="btn" onclick="logout()">🚪 خروج</button>
-</div>
+const app = document.getElementById("app");
 
-<div class="main">
+let users = JSON.parse(localStorage.getItem("users") || "{}");
+let currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
-<!-- HOME -->
-<div id="home">
-<h2>📊 GOD DASHBOARD</h2>
+let mods = [
+{name:"BMW MOD",price:0,url:"https://example.com"},
+{name:"DRIFT PACK",price:5,url:"https://example.com"}
+];
 
-<div class="card">
-<h2 id="count">0</h2>
-<p>📦 تعداد پست‌ها</p>
-</div>
+/* ================= LOGIN PAGE ================= */
 
-<div class="card">
-<h2 id="likesTotal">0</h2>
-<p>❤️ مجموع لایک‌ها</p>
-</div>
+function loginPage(){
+app.innerHTML=`
+<h2>🔐 Login / Register</h2>
 
-</div>
+<input id="email" placeholder="email"><br>
+<input id="pass" type="password" placeholder="password"><br>
 
-<!-- UPLOAD -->
-<div id="upload" style="display:none">
-<h2>📤 Upload</h2>
-<input type="file" id="file">
-<button class="btn" onclick="upload()">Upload</button>
-</div>
-
-<!-- GALLERY -->
-<div id="gallery" style="display:none">
-<h2>🖼️ GOD GALLERY</h2>
-<div class="grid" id="galleryBox"></div>
-</div>
-
-</div>
-</div>
-
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB3OjZrgFVpfdayvDSOFB5f5OmChDj4tvo",
-  authDomain: "arad-beamng.firebaseapp.com",
-  projectId: "arad-beamng",
-  storageBucket: "arad-beamng.appspot.com",
-  messagingSenderId: "259621342630",
-  appId: "1:259621342630:web:8640e6c867e38980abd367"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const storage = getStorage(app);
-const db = getFirestore(app);
-
-/* LOGIN */
-window.login = async function(){
-await signInWithEmailAndPassword(
-auth,
-document.getElementById("email").value,
-document.getElementById("pass").value
-);
+<button onclick="register()">Register</button>
+<button onclick="login()">Login</button>
+`;
 }
 
-/* LOGOUT */
-window.logout = function(){
-signOut(auth);
+/* ================= REGISTER ================= */
+
+function register(){
+
+let email = document.getElementById("email").value;
+let pass = document.getElementById("pass").value;
+
+if(!email || !pass){
+alert("پر کن");
+return;
 }
 
-/* AUTH */
-onAuthStateChanged(auth,(user)=>{
-if(user){
-document.getElementById("login").style.display="none";
-document.getElementById("dash").style.display="grid";
-loadGallery();
+if(users[email]){
+alert("قبلاً ثبت شده");
+return;
+}
+
+users[email] = {email,pass,mods:[]};
+
+localStorage.setItem("users",JSON.stringify(users));
+
+alert("ساخته شد");
+}
+
+/* ================= LOGIN ================= */
+
+function login(){
+
+let email = document.getElementById("email").value;
+let pass = document.getElementById("pass").value;
+
+if(users[email] && users[email].pass === pass){
+
+currentUser = users[email];
+
+localStorage.setItem("user",JSON.stringify(currentUser));
+
+dashboard();
+
 }else{
-document.getElementById("login").style.display="flex";
-document.getElementById("dash").style.display="none";
+alert("اشتباه");
 }
-});
-
-/* NAV */
-window.show = function(p){
-home.style.display="none";
-upload.style.display="none";
-gallery.style.display="none";
-document.getElementById(p).style.display="block";
 }
 
-/* UPLOAD */
-window.upload = async function(){
-const file=document.getElementById("file").files[0];
+/* ================= DASHBOARD ================= */
 
-const fileRef=ref(storage,"uploads/"+file.name);
-await uploadBytes(fileRef,file);
-const url=await getDownloadURL(fileRef);
+function dashboard(){
 
-await addDoc(collection(db,"gallery"),{
-url:url,
-name:file.name,
-likes:0,
-views:0
-});
+app.innerHTML=`
+<h2>🔥 ARAD STORE</h2>
 
-loadGallery();
+<button onclick="store()">Store</button>
+<button onclick="myMods()">My Mods</button>
+<button onclick="logout()">Logout</button>
+
+<div id="main"></div>
+`;
+
+window.main = document.getElementById("main");
+
+store();
 }
 
-/* LOAD */
-async function loadGallery(){
-const snap=await getDocs(collection(db,"gallery"));
+/* ================= STORE ================= */
 
-let box=document.getElementById("galleryBox");
-box.innerHTML="";
+function store(){
 
-let totalLikes=0;
-let count=0;
+main.innerHTML="<h3>🚗 Mods</h3>";
 
-snap.forEach(d=>{
-const data=d.data();
-count++;
-totalLikes+=data.likes || 0;
+mods.forEach((m,i)=>{
 
-box.innerHTML+=`
-<div class="item">
-<img src="${data.url}">
-<p>${data.name}</p>
-<p class="small">❤️ ${data.likes || 0} | 👁️ ${data.views || 0}</p>
-<button class="like" onclick="like('${d.id}',${data.likes||0})">Like</button>
+main.innerHTML+=`
+<div class="card">
+<b>${m.name}</b><br>
+💰 ${m.price==0?"Free":m.price+"$"}<br>
+
+<button onclick="buy(${i})">
+${m.price==0?"Download":"Buy"}
+</button>
 </div>
 `;
 });
-
-countEl.innerText=count;
-likesTotal.innerText=totalLikes;
 }
 
-/* LIKE */
-window.like = async function(id,likes){
-const refDoc=doc(db,"gallery",id);
-await updateDoc(refDoc,{
-likes:likes+1
+/* ================= BUY ================= */
+
+function buy(i){
+
+let u = JSON.parse(localStorage.getItem("user"));
+
+if(mods[i].price==0){
+addMod(i);
+return;
+}
+
+alert("خرید انجام شد (تستی)");
+addMod(i);
+}
+
+/* ================= ADD MOD ================= */
+
+function addMod(i){
+
+users = JSON.parse(localStorage.getItem("users"));
+currentUser = JSON.parse(localStorage.getItem("user"));
+
+users[currentUser.email].mods.push(mods[i]);
+
+localStorage.setItem("users",JSON.stringify(users));
+localStorage.setItem("user",JSON.stringify(users[currentUser.email]));
+
+alert("اضافه شد به حساب");
+}
+
+/* ================= MY MODS ================= */
+
+function myMods(){
+
+let u = JSON.parse(localStorage.getItem("user"));
+
+main.innerHTML="<h3>📥 My Mods</h3>";
+
+if(!u || !u.mods.length){
+main.innerHTML+="<div class='card'>خالیه</div>";
+return;
+}
+
+u.mods.forEach(m=>{
+main.innerHTML+=`
+<div class="card">
+${m.name}<br>
+<button onclick="window.open('${m.url}')">Download</button>
+</div>
+`;
 });
-loadGallery();
+}
+
+/* ================= LOGOUT ================= */
+
+function logout(){
+localStorage.removeItem("user");
+currentUser=null;
+loginPage();
+}
+
+/* ================= START ================= */
+
+if(currentUser){
+dashboard();
+}else{
+loginPage();
 }
 
 </script>
