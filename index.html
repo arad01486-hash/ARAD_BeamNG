@@ -2,176 +2,204 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>ARAD STORE PRO UI</title>
+<title>ARAD STEAM STORE</title>
 
 <style>
 body{
 margin:0;
 font-family:Segoe UI;
-background: radial-gradient(circle at top,#1a1a1a,#000);
+background:#0b0f14;
 color:white;
 direction:rtl;
-text-align:center;
-}
-
-h2{
-color:#00ffcc;
-text-shadow:0 0 10px #00ffcc;
-}
-
-.card{
-background:linear-gradient(145deg,#1c1c1c,#0e0e0e);
-padding:15px;
-margin:12px;
-border-radius:14px;
-display:inline-block;
-width:320px;
-border:1px solid #222;
-transition:0.2s;
-box-shadow:0 0 10px rgba(0,255,204,0.1);
-}
-
-.card:hover{
-transform:scale(1.05);
-border-color:#00ffcc;
-box-shadow:0 0 20px rgba(0,255,204,0.4);
-}
-
-button{
-padding:10px 15px;
-margin:5px;
-border:none;
-border-radius:8px;
-cursor:pointer;
-background:#00ffcc;
-color:black;
-font-weight:bold;
-}
-
-button:hover{
-background:#00ccaa;
-}
-
-input{
-padding:10px;
-margin:5px;
-border-radius:8px;
-border:none;
-outline:none;
-width:200px;
 }
 
 .topbar{
-background:#111;
-padding:10px;
+background:#111827;
+padding:12px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 border-bottom:1px solid #222;
-margin-bottom:20px;
+}
+
+.logo{
+color:#00ffcc;
+font-weight:bold;
+font-size:18px;
+}
+
+.btn{
+background:#00ffcc;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.btn:hover{background:#00c2a3;}
+
+.container{
+display:flex;
+}
+
+.sidebar{
+width:220px;
+background:#0f172a;
+height:100vh;
+padding:10px;
+border-left:1px solid #222;
+}
+
+.sidebar button{
+width:100%;
+margin:5px 0;
+padding:10px;
+background:#111827;
+border:none;
+color:white;
+border-radius:8px;
+cursor:pointer;
+}
+
+.sidebar button:hover{
+background:#1f2937;
+}
+
+.main{
+flex:1;
+padding:20px;
+}
+
+.card{
+background:#111827;
+padding:15px;
+margin:10px;
+border-radius:12px;
+border:1px solid #1f2937;
+transition:0.2s;
+}
+
+.card:hover{
+transform:scale(1.03);
+border-color:#00ffcc;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app"></div>
+<div class="topbar">
+<div class="logo">🔥 ARAD STEAM STORE</div>
+<div>
+<button class="btn" onclick="logout()">Logout</button>
+</div>
+</div>
+
+<div class="container">
+
+<div class="sidebar">
+<button onclick="showStore()">Store</button>
+<button onclick="showCart()">Cart</button>
+<button onclick="showAdmin()">Admin</button>
+</div>
+
+<div class="main" id="main"></div>
+
+</div>
 
 <script>
-const app = document.getElementById("app");
 
+/* ================= SAFE STORAGE ================= */
 let users = JSON.parse(localStorage.getItem("users") || "{}");
-let currentUser = JSON.parse(localStorage.getItem("user") || "null");
+let user = JSON.parse(localStorage.getItem("user") || "null");
+
+let cart = [];
 
 let mods = [
-{name:"BMW M5 DRIFT",price:0,url:"https://example.com"},
-{name:"JDM PACK PRO",price:5,url:"https://example.com"},
-{name:"OFFROAD MONSTER",price:3,url:"https://example.com"}
+{name:"BMW M5 Drift",price:0,url:"#"},
+{name:"JDM Pack Pro",price:5,url:"#"},
+{name:"Offroad Beast",price:3,url:"#"}
 ];
 
 /* ================= LOGIN ================= */
 
 function loginPage(){
-app.innerHTML=`
-<div class="topbar">
-<h2>🔥 ARAD STORE</h2>
-</div>
+document.body.innerHTML=`
+<div style="text-align:center;margin-top:100px;">
+<h2>Login</h2>
+<input id="email" placeholder="email"><br><br>
+<input id="pass" type="password" placeholder="password"><br><br>
 
-<h3>Login / Register</h3>
-
-<input id="email" placeholder="email"><br>
-<input id="pass" type="password" placeholder="password"><br>
-
-<br>
-<button onclick="register()">Register</button>
 <button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+</div>
 `;
 }
 
-/* ================= REGISTER ================= */
-
 function register(){
-let email=email.value;
-let pass=pass.value;
+let e=document.getElementById("email").value;
+let p=document.getElementById("pass").value;
 
-if(!email||!pass){
-alert("پر کن");
-return;
-}
+if(!e||!p) return alert("پر کن");
 
-if(users[email]){
-alert("قبلاً ثبت شده");
-return;
-}
+if(users[e]) return alert("وجود دارد");
 
-users[email]={email,pass,mods:[]};
+users[e]={email:e,pass:p,mods:[]};
 localStorage.setItem("users",JSON.stringify(users));
 
 alert("ساخته شد");
 }
 
-/* ================= LOGIN ================= */
-
 function login(){
-let email=document.getElementById("email").value;
-let pass=document.getElementById("pass").value;
+let e=document.getElementById("email").value;
+let p=document.getElementById("pass").value;
 
-if(users[email] && users[email].pass===pass){
-currentUser=users[email];
-localStorage.setItem("user",JSON.stringify(currentUser));
-dashboard();
+if(users[e] && users[e].pass===p){
+user=users[e];
+localStorage.setItem("user",JSON.stringify(user));
+init();
 }else{
 alert("اشتباه");
 }
 }
 
-/* ================= DASHBOARD ================= */
+/* ================= INIT ================= */
 
-function dashboard(){
-app.innerHTML=`
+function init(){
+document.body.innerHTML=`
 <div class="topbar">
-<h2>🔥 ARAD STORE</h2>
-<button onclick="store()">Store</button>
-<button onclick="myMods()">My Mods</button>
-<button onclick="logout()">Logout</button>
+<div class="logo">🔥 ARAD STEAM STORE</div>
+<button class="btn" onclick="logout()">Logout</button>
 </div>
 
-<div id="main"></div>
+<div class="container">
+<div class="sidebar">
+<button onclick="showStore()">Store</button>
+<button onclick="showCart()">Cart</button>
+<button onclick="showAdmin()">Admin</button>
+</div>
+
+<div class="main" id="main"></div>
+</div>
 `;
 
-window.main=document.getElementById("main");
-store();
+showStore();
 }
 
 /* ================= STORE ================= */
 
-function store(){
-main.innerHTML="<h3>🚗 Mods</h3>";
+function showStore(){
+
+main.innerHTML="<h2>🚗 Store</h2>";
 
 mods.forEach((m,i)=>{
 main.innerHTML+=`
 <div class="card">
 <b>${m.name}</b><br>
-💰 ${m.price==0?"Free":m.price+"$"}<br>
+💰 ${m.price==0?"Free":m.price+"$"}<br><br>
 
-<button onclick="buy(${i})">
+<button class="btn" onclick="buy(${i})">
 ${m.price==0?"Download":"Buy"}
 </button>
 </div>
@@ -182,18 +210,22 @@ ${m.price==0?"Download":"Buy"}
 /* ================= BUY ================= */
 
 function buy(i){
+
+let u=JSON.parse(localStorage.getItem("user"));
+
 if(mods[i].price==0){
-addMod(i);
+add(i);
 return;
 }
 
-alert("خرید موفق (تستی)");
-addMod(i);
+alert("پرداخت شبیه‌سازی شد");
+add(i);
 }
 
-/* ================= ADD MOD ================= */
+/* ================= ADD ================= */
 
-function addMod(i){
+function add(i){
+
 let users=JSON.parse(localStorage.getItem("users"));
 let u=JSON.parse(localStorage.getItem("user"));
 
@@ -205,40 +237,48 @@ localStorage.setItem("user",JSON.stringify(users[u.email]));
 alert("اضافه شد");
 }
 
-/* ================= MY MODS ================= */
+/* ================= CART ================= */
 
-function myMods(){
-let u=JSON.parse(localStorage.getItem("user"));
-
-main.innerHTML="<h3>📥 My Mods</h3>";
-
-if(!u.mods.length){
-main.innerHTML+="<div class='card'>خالیه</div>";
-return;
+function showCart(){
+main.innerHTML="<h2>🛒 Cart</h2><div class='card'>نسخه بعدی کامل میشه</div>";
 }
 
-u.mods.forEach(m=>{
-main.innerHTML+=`
-<div class="card">
-${m.name}<br>
-<button onclick="window.open('${m.url}')">Download</button>
-</div>
+/* ================= ADMIN ================= */
+
+function showAdmin(){
+main.innerHTML=`
+<h2>🧑‍💻 Admin Panel</h2>
+
+<input id="name" placeholder="name"><br>
+<input id="price" placeholder="price"><br>
+
+<button class="btn" onclick="addMod()">Add Mod</button>
 `;
+}
+
+function addMod(){
+
+mods.push({
+name:name.value,
+price:Number(price.value),
+url:"#"
 });
+
+alert("اضافه شد");
+showStore();
 }
 
 /* ================= LOGOUT ================= */
 
 function logout(){
 localStorage.removeItem("user");
-currentUser=null;
-loginPage();
+location.reload();
 }
 
 /* ================= START ================= */
 
-if(currentUser){
-dashboard();
+if(user){
+init();
 }else{
 loginPage();
 }
