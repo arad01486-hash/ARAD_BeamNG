@@ -2,30 +2,70 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>ARAD STORE SAFE</title>
+<title>ARAD STORE PRO UI</title>
 
 <style>
 body{
 margin:0;
-font-family:tahoma;
-background:#0b0b0b;
+font-family:Segoe UI;
+background: radial-gradient(circle at top,#1a1a1a,#000);
 color:white;
-text-align:center;
 direction:rtl;
+text-align:center;
+}
+
+h2{
+color:#00ffcc;
+text-shadow:0 0 10px #00ffcc;
 }
 
 .card{
-background:#1a1a1a;
+background:linear-gradient(145deg,#1c1c1c,#0e0e0e);
 padding:15px;
-margin:10px;
-border-radius:10px;
+margin:12px;
+border-radius:14px;
 display:inline-block;
-width:300px;
+width:320px;
+border:1px solid #222;
+transition:0.2s;
+box-shadow:0 0 10px rgba(0,255,204,0.1);
 }
 
-button,input{
+.card:hover{
+transform:scale(1.05);
+border-color:#00ffcc;
+box-shadow:0 0 20px rgba(0,255,204,0.4);
+}
+
+button{
+padding:10px 15px;
+margin:5px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+background:#00ffcc;
+color:black;
+font-weight:bold;
+}
+
+button:hover{
+background:#00ccaa;
+}
+
+input{
 padding:10px;
 margin:5px;
+border-radius:8px;
+border:none;
+outline:none;
+width:200px;
+}
+
+.topbar{
+background:#111;
+padding:10px;
+border-bottom:1px solid #222;
+margin-bottom:20px;
 }
 </style>
 </head>
@@ -35,27 +75,31 @@ margin:5px;
 <div id="app"></div>
 
 <script>
-/* ================= SAFE CORE ================= */
-
 const app = document.getElementById("app");
 
 let users = JSON.parse(localStorage.getItem("users") || "{}");
 let currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
 let mods = [
-{name:"BMW MOD",price:0,url:"https://example.com"},
-{name:"DRIFT PACK",price:5,url:"https://example.com"}
+{name:"BMW M5 DRIFT",price:0,url:"https://example.com"},
+{name:"JDM PACK PRO",price:5,url:"https://example.com"},
+{name:"OFFROAD MONSTER",price:3,url:"https://example.com"}
 ];
 
-/* ================= LOGIN PAGE ================= */
+/* ================= LOGIN ================= */
 
 function loginPage(){
 app.innerHTML=`
-<h2>🔐 Login / Register</h2>
+<div class="topbar">
+<h2>🔥 ARAD STORE</h2>
+</div>
+
+<h3>Login / Register</h3>
 
 <input id="email" placeholder="email"><br>
 <input id="pass" type="password" placeholder="password"><br>
 
+<br>
 <button onclick="register()">Register</button>
 <button onclick="login()">Login</button>
 `;
@@ -64,11 +108,10 @@ app.innerHTML=`
 /* ================= REGISTER ================= */
 
 function register(){
+let email=email.value;
+let pass=pass.value;
 
-let email = document.getElementById("email").value;
-let pass = document.getElementById("pass").value;
-
-if(!email || !pass){
+if(!email||!pass){
 alert("پر کن");
 return;
 }
@@ -78,8 +121,7 @@ alert("قبلاً ثبت شده");
 return;
 }
 
-users[email] = {email,pass,mods:[]};
-
+users[email]={email,pass,mods:[]};
 localStorage.setItem("users",JSON.stringify(users));
 
 alert("ساخته شد");
@@ -88,18 +130,13 @@ alert("ساخته شد");
 /* ================= LOGIN ================= */
 
 function login(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("pass").value;
 
-let email = document.getElementById("email").value;
-let pass = document.getElementById("pass").value;
-
-if(users[email] && users[email].pass === pass){
-
-currentUser = users[email];
-
+if(users[email] && users[email].pass===pass){
+currentUser=users[email];
 localStorage.setItem("user",JSON.stringify(currentUser));
-
 dashboard();
-
 }else{
 alert("اشتباه");
 }
@@ -108,30 +145,27 @@ alert("اشتباه");
 /* ================= DASHBOARD ================= */
 
 function dashboard(){
-
 app.innerHTML=`
+<div class="topbar">
 <h2>🔥 ARAD STORE</h2>
-
 <button onclick="store()">Store</button>
 <button onclick="myMods()">My Mods</button>
 <button onclick="logout()">Logout</button>
+</div>
 
 <div id="main"></div>
 `;
 
-window.main = document.getElementById("main");
-
+window.main=document.getElementById("main");
 store();
 }
 
 /* ================= STORE ================= */
 
 function store(){
-
 main.innerHTML="<h3>🚗 Mods</h3>";
 
 mods.forEach((m,i)=>{
-
 main.innerHTML+=`
 <div class="card">
 <b>${m.name}</b><br>
@@ -148,42 +182,37 @@ ${m.price==0?"Download":"Buy"}
 /* ================= BUY ================= */
 
 function buy(i){
-
-let u = JSON.parse(localStorage.getItem("user"));
-
 if(mods[i].price==0){
 addMod(i);
 return;
 }
 
-alert("خرید انجام شد (تستی)");
+alert("خرید موفق (تستی)");
 addMod(i);
 }
 
 /* ================= ADD MOD ================= */
 
 function addMod(i){
+let users=JSON.parse(localStorage.getItem("users"));
+let u=JSON.parse(localStorage.getItem("user"));
 
-users = JSON.parse(localStorage.getItem("users"));
-currentUser = JSON.parse(localStorage.getItem("user"));
-
-users[currentUser.email].mods.push(mods[i]);
+users[u.email].mods.push(mods[i]);
 
 localStorage.setItem("users",JSON.stringify(users));
-localStorage.setItem("user",JSON.stringify(users[currentUser.email]));
+localStorage.setItem("user",JSON.stringify(users[u.email]));
 
-alert("اضافه شد به حساب");
+alert("اضافه شد");
 }
 
 /* ================= MY MODS ================= */
 
 function myMods(){
-
-let u = JSON.parse(localStorage.getItem("user"));
+let u=JSON.parse(localStorage.getItem("user"));
 
 main.innerHTML="<h3>📥 My Mods</h3>";
 
-if(!u || !u.mods.length){
+if(!u.mods.length){
 main.innerHTML+="<div class='card'>خالیه</div>";
 return;
 }
