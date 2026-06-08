@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD BeamNG DASHBOARD</title>
+<title>ARAD BeamNG PRO DASHBOARD</title>
 
 <style>
 body{
@@ -40,12 +40,12 @@ cursor:pointer;
 font-weight:bold;
 }
 
-/* DASHBOARD LAYOUT */
+/* DASHBOARD */
 #dash{
 display:none;
 height:100vh;
-display:grid;
 grid-template-columns:220px 1fr;
+display:grid;
 }
 
 /* SIDEBAR */
@@ -78,7 +78,7 @@ padding:15px;
 border-radius:12px;
 }
 
-/* GALLERY */
+/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -102,8 +102,8 @@ position:absolute;
 top:5px;
 left:5px;
 background:red;
-border:none;
 color:white;
+border:none;
 border-radius:5px;
 cursor:pointer;
 }
@@ -114,7 +114,7 @@ cursor:pointer;
 
 <!-- LOGIN -->
 <div id="login">
-<h2>🔐 Admin Login</h2>
+<h2>🔐 Login</h2>
 <input id="email" placeholder="Email">
 <input id="pass" type="password" placeholder="Password">
 <button class="btn" onclick="login()">Login</button>
@@ -143,12 +143,12 @@ cursor:pointer;
 <div class="cards">
 <div class="card">
 <h3 id="count">0</h3>
-<p>تعداد عکس‌ها</p>
+<p>تعداد فایل‌ها</p>
 </div>
 
 <div class="card">
 <h3>🔥 LIVE</h3>
-<p>سایت فعال</p>
+<p>سایت آنلاین</p>
 </div>
 </div>
 
@@ -156,14 +156,14 @@ cursor:pointer;
 
 <!-- UPLOAD -->
 <div id="upload" style="display:none">
-<h2>📤 آپلود</h2>
+<h2>📤 آپلود فایل</h2>
 <input type="file" id="file">
 <button class="btn" onclick="upload()">آپلود</button>
 </div>
 
 <!-- GALLERY -->
 <div id="gallery" style="display:none">
-<h2>🖼️ گالری مدیریت</h2>
+<h2>🖼️ گالری</h2>
 <div class="grid" id="galleryBox"></div>
 </div>
 
@@ -191,19 +191,18 @@ const firebaseConfig = {
   appId: "1:259621342630:web:8640e6c867e38980abd367"
 };
 
-const ADMIN_EMAIL = "admin@gmail.com";
+const ADMIN_EMAIL = "admin@gmail.com"; // 👑 ایمیل خودت رو اینجا بزن
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const db = getFirestore(app);
 
-let imagesCount = 0;
-
 /* LOGIN */
 window.login = async function(){
 const email = document.getElementById("email").value;
 const pass = document.getElementById("pass").value;
+
 await signInWithEmailAndPassword(auth,email,pass);
 }
 
@@ -214,7 +213,7 @@ signOut(auth);
 
 /* AUTH */
 onAuthStateChanged(auth,(user)=>{
-if(user && user.email === ADMIN_EMAIL){
+if(user){
 document.getElementById("login").style.display="none";
 document.getElementById("dash").style.display="grid";
 loadGallery();
@@ -253,17 +252,17 @@ loadGallery();
 alert("Uploaded 🚀");
 }
 
-/* LOAD */
+/* LOAD GALLERY */
 async function loadGallery(){
 const snap = await getDocs(collection(db,"gallery"));
 
 const box = document.getElementById("galleryBox");
 box.innerHTML="";
-imagesCount = 0;
+let count = 0;
 
 snap.forEach(d=>{
 const data = d.data();
-imagesCount++;
+count++;
 
 box.innerHTML += `
 <div class="item">
@@ -274,7 +273,7 @@ box.innerHTML += `
 `;
 });
 
-document.getElementById("count").innerText = imagesCount;
+document.getElementById("count").innerText = count;
 }
 
 /* DELETE */
