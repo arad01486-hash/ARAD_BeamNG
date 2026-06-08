@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD BeamNG PRO</title>
+<title>ARAD BeamNG DASHBOARD</title>
 
 <style>
 body{
@@ -13,29 +13,22 @@ background:#0a0f1f;
 color:white;
 }
 
-nav{
-background:#111827;
-padding:15px;
-text-align:center;
-position:sticky;
-top:0;
-z-index:1000;
+/* LOGIN */
+#login{
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
 }
 
-nav a{
-color:#00e5ff;
-text-decoration:none;
-margin:0 10px;
-font-weight:bold;
+input{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:10px;
+width:220px;
 }
-
-header{
-padding:70px 20px;
-text-align:center;
-background:linear-gradient(135deg,#0f172a,#1e293b);
-}
-
-h1{color:#00e5ff;font-size:55px}
 
 .btn{
 padding:10px 15px;
@@ -45,116 +38,134 @@ border:none;
 border-radius:10px;
 cursor:pointer;
 font-weight:bold;
-margin:10px;
 }
 
-.section{
-padding:40px 20px;
-}
-
-h2{color:#00e5ff}
-
-.grid{
+/* DASHBOARD LAYOUT */
+#dash{
+display:none;
+height:100vh;
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:20px;
+grid-template-columns:220px 1fr;
+}
+
+/* SIDEBAR */
+.sidebar{
+background:#111827;
+padding:15px;
+display:flex;
+flex-direction:column;
+}
+
+.sidebar button{
+margin:5px 0;
+}
+
+/* MAIN */
+.main{
+padding:20px;
+overflow:auto;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
 }
 
 .card{
 background:#1e293b;
-padding:10px;
+padding:15px;
 border-radius:12px;
-transition:.3s;
 }
 
-.card:hover{transform:scale(1.05)}
+/* GALLERY */
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:10px;
+}
 
-.card img{
+.item{
+background:#1e293b;
+padding:10px;
+border-radius:10px;
+position:relative;
+}
+
+.item img{
 width:100%;
 border-radius:10px;
 }
 
-/* MODAL */
-.modal{
-display:none;
-position:fixed;
-top:0;left:0;
-width:100%;height:100%;
-background:rgba(0,0,0,0.8);
-justify-content:center;
-align-items:center;
-}
-
-.box{
-background:#1e293b;
-padding:20px;
-border-radius:15px;
-width:300px;
-text-align:center;
-}
-
-input{
-padding:10px;
-width:90%;
-margin:5px 0;
-border-radius:10px;
+.del{
+position:absolute;
+top:5px;
+left:5px;
+background:red;
 border:none;
+color:white;
+border-radius:5px;
+cursor:pointer;
 }
-
-.hide{display:none !important}
 </style>
 </head>
 
 <body>
 
-<!-- NAV -->
-<nav>
-<a href="#home">خانه</a>
-<a href="#gallery">گالری</a>
-<a href="#mods">مودها</a>
-<a href="#news">اخبار</a>
-</nav>
-
-<!-- HERO -->
-<header id="home">
-<h1>ARAD BeamNG 🚗</h1>
-<p>سایت حرفه‌ای مود و شات BeamNG</p>
-
-<button class="btn" onclick="login()">ورود ادمین</button>
-<button class="btn hide" id="upBtn" onclick="openUpload()">📤 آپلود</button>
-</header>
-
-<!-- GALLERY -->
-<section class="section" id="gallery">
-<h2>🖼️ گالری</h2>
-<div class="grid" id="galleryBox"></div>
-</section>
-
-<!-- MODS -->
-<section class="section" id="mods">
-<h2>🆓 مودها</h2>
-
-<div class="grid">
-<div class="card"><h3>پژو 405</h3></div>
-<div class="card"><h3>پراید اسپرت</h3></div>
+<!-- LOGIN -->
+<div id="login">
+<h2>🔐 Admin Login</h2>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button class="btn" onclick="login()">Login</button>
 </div>
-</section>
 
-<!-- NEWS -->
-<section class="section" id="news">
-<h2>📢 اخبار</h2>
+<!-- DASHBOARD -->
+<div id="dash">
 
-<div class="card">🔥 سایت ARAD BeamNG آنلاین شد</div>
-<div class="card">🚗 سیستم آپلود فعال شد</div>
-</section>
+<!-- SIDEBAR -->
+<div class="sidebar">
+<h3>🚗 ARAD PANEL</h3>
+
+<button class="btn" onclick="show('home')">🏠 داشبورد</button>
+<button class="btn" onclick="show('upload')">📤 آپلود</button>
+<button class="btn" onclick="show('gallery')">🖼️ گالری</button>
+<button class="btn" onclick="logout()">🚪 خروج</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- HOME -->
+<div id="home">
+<h2>📊 داشبورد</h2>
+
+<div class="cards">
+<div class="card">
+<h3 id="count">0</h3>
+<p>تعداد عکس‌ها</p>
+</div>
+
+<div class="card">
+<h3>🔥 LIVE</h3>
+<p>سایت فعال</p>
+</div>
+</div>
+
+</div>
 
 <!-- UPLOAD -->
-<div class="modal" id="modal">
-<div class="box">
-
-<h3>📤 آپلود شات</h3>
+<div id="upload" style="display:none">
+<h2>📤 آپلود</h2>
 <input type="file" id="file">
 <button class="btn" onclick="upload()">آپلود</button>
+</div>
+
+<!-- GALLERY -->
+<div id="gallery" style="display:none">
+<h2>🖼️ گالری مدیریت</h2>
+<div class="grid" id="galleryBox"></div>
+</div>
 
 </div>
 </div>
@@ -162,71 +173,116 @@ border:none;
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+import { getStorage, ref, uploadBytes, getDownloadURL } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB3OjZrgFVpfdayvDSOFB5f5OmChDj4tvo",
   authDomain: "arad-beamng.firebaseapp.com",
   projectId: "arad-beamng",
-  storageBucket: "arad-beamng.firebasestorage.app",
+  storageBucket: "arad-beamng.appspot.com",
   messagingSenderId: "259621342630",
-  appId: "1:259621342630:web:8640e6c867e38980abd367",
-  measurementId: "G-89MH9P5GZV"
+  appId: "1:259621342630:web:8640e6c867e38980abd367"
 };
 
-initializeApp(firebaseConfig);
-</script>
+const ADMIN_EMAIL = "admin@gmail.com";
 
-<script>
-let isAdmin=false;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const storage = getStorage(app);
+const db = getFirestore(app);
+
+let imagesCount = 0;
 
 /* LOGIN */
-function login(){
-let pass=prompt("رمز ادمین:");
+window.login = async function(){
+const email = document.getElementById("email").value;
+const pass = document.getElementById("pass").value;
+await signInWithEmailAndPassword(auth,email,pass);
+}
 
-if(pass==="1234"){
-alert("ادمین شدی 😎");
-isAdmin=true;
-document.getElementById("upBtn").classList.remove("hide");
+/* LOGOUT */
+window.logout = function(){
+signOut(auth);
+}
+
+/* AUTH */
+onAuthStateChanged(auth,(user)=>{
+if(user && user.email === ADMIN_EMAIL){
+document.getElementById("login").style.display="none";
+document.getElementById("dash").style.display="grid";
+loadGallery();
 }else{
-alert("اشتباهه!");
+document.getElementById("login").style.display="flex";
+document.getElementById("dash").style.display="none";
 }
-}
+});
 
-/* OPEN UPLOAD */
-function openUpload(){
-document.getElementById("modal").style.display="flex";
-}
+/* NAV */
+window.show = function(page){
+document.getElementById("home").style.display="none";
+document.getElementById("upload").style.display="none";
+document.getElementById("gallery").style.display="none";
 
-/* UPLOAD (فعلاً محلی + گالری) */
-function upload(){
-let file=document.getElementById("file").files[0];
+document.getElementById(page).style.display="block";
 
-if(!file){
-alert("فایل انتخاب کن");
-return;
+if(page==="gallery") loadGallery();
 }
 
-let reader=new FileReader();
+/* UPLOAD */
+window.upload = async function(){
+const file = document.getElementById("file").files[0];
 
-reader.onload=function(e){
+const fileRef = ref(storage,"uploads/"+file.name);
+await uploadBytes(fileRef,file);
 
-let div=document.createElement("div");
-div.className="card";
+const url = await getDownloadURL(fileRef);
 
-div.innerHTML=`
-<img src="${e.target.result}">
-<p>${file.name}</p>
+await addDoc(collection(db,"gallery"),{
+url:url,
+name:file.name
+});
+
+loadGallery();
+alert("Uploaded 🚀");
+}
+
+/* LOAD */
+async function loadGallery(){
+const snap = await getDocs(collection(db,"gallery"));
+
+const box = document.getElementById("galleryBox");
+box.innerHTML="";
+imagesCount = 0;
+
+snap.forEach(d=>{
+const data = d.data();
+imagesCount++;
+
+box.innerHTML += `
+<div class="item">
+<button class="del" onclick="del('${d.id}')">X</button>
+<img src="${data.url}">
+<p>${data.name}</p>
+</div>
 `;
+});
 
-document.getElementById("galleryBox").appendChild(div);
-
-alert("Upload Successful 🚀");
-};
-
-reader.readAsDataURL(file);
-
-document.getElementById("modal").style.display="none";
+document.getElementById("count").innerText = imagesCount;
 }
+
+/* DELETE */
+window.del = async function(id){
+await deleteDoc(doc(db,"gallery",id));
+loadGallery();
+}
+
 </script>
 
 </body>
