@@ -2,53 +2,37 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<title>ARAD MOD STORE</title>
+<title>ARAD PRO MOD STORE</title>
 
 <style>
 body{
 margin:0;
 font-family:tahoma;
-background:#0d0d0d;
+background:#0b0f14;
 color:white;
 direction:rtl;
-text-align:center;
 }
 
-.header{
-background:#111;
-padding:15px;
-color:#00ffcc;
-font-weight:bold;
-font-size:20px;
-}
-
-.card{
-background:#1a1a1a;
+.box{
+background:#111827;
 padding:15px;
 margin:10px auto;
 width:320px;
 border-radius:10px;
-border:1px solid #222;
+}
+
+input,button{
+padding:10px;
+margin:5px;
+width:200px;
 }
 
 button{
-padding:10px 15px;
-margin-top:8px;
 background:#00ffcc;
 border:none;
 border-radius:8px;
 cursor:pointer;
 font-weight:bold;
-}
-
-button:hover{
-background:#00c2a3;
-}
-
-input{
-padding:10px;
-margin:5px;
-width:200px;
 }
 </style>
 </head>
@@ -57,70 +41,56 @@ width:200px;
 
 <div id="app"></div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
 <script>
 
+/* ================= FIREBASE ================= */
+const firebaseConfig = {
+apiKey: "YOUR_KEY",
+authDomain: "YOUR_DOMAIN",
+projectId: "YOUR_ID",
+storageBucket: "YOUR_BUCKET"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+const storage=firebase.storage();
+
 const app=document.getElementById("app");
-
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-let user=JSON.parse(localStorage.getItem("user")||"null");
-
-let mods=[
-{name:"BMW MOD",price:0,url:"https://example.com"},
-{name:"DRIFT PACK",price:5,url:"https://example.com"}
-];
 
 /* ================= LOGIN ================= */
 
 function loginPage(){
 app.innerHTML=`
-<div class="header">ARAD MOD STORE</div>
+<h2>ARAD PRO LOGIN</h2>
 
-<h3>Login / Register</h3>
-
+<div class="box">
 <input id="email" placeholder="email"><br>
 <input id="pass" type="password" placeholder="password"><br>
 
-<br>
-<button onclick="register()">Register</button>
 <button onclick="login()">Login</button>
+<button onclick="register()">Register</button>
+</div>
 `;
 }
 
-/* ================= REGISTER ================= */
-
 function register(){
-
-let e=document.getElementById("email").value;
-let p=document.getElementById("pass").value;
-
-if(!e||!p) return alert("پر کن");
-
-if(users[e]) return alert("وجود دارد");
-
-users[e]={email:e,pass:p,mods:[]};
-
-localStorage.setItem("users",JSON.stringify(users));
-
-alert("ساخته شد");
+auth.createUserWithEmailAndPassword(email.value,pass.value)
+.then(()=>alert("ساخته شد"))
+.catch(e=>alert(e.message));
 }
-
-/* ================= LOGIN ================= */
 
 function login(){
-
-let e=document.getElementById("email").value;
-let p=document.getElementById("pass").value;
-
-if(users[e] && users[e].pass===p){
-
-user=users[e];
-localStorage.setItem("user",JSON.stringify(user));
-
-dashboard();
-
-}else{
-alert("اشتباه");
-}
+auth.signInWithEmailAndPassword(email.value,pass.value)
+.then(()=>dashboard())
+.catch(e=>alert(e.message));
 }
 
 /* ================= DASHBOARD ================= */
@@ -128,10 +98,10 @@ alert("اشتباه");
 function dashboard(){
 
 app.innerHTML=`
-<div class="header">ARAD MOD STORE</div>
+<h2>🔥 ARAD MOD STORE PRO</h2>
 
 <button onclick="store()">Store</button>
-<button onclick="myMods()">My Mods</button>
+<button onclick="admin()">Admin Panel</button>
 <button onclick="logout()">Logout</button>
 
 <div id="main"></div>
@@ -144,89 +114,86 @@ store();
 
 /* ================= STORE ================= */
 
-function store(){
+async function store(){
 
-main.innerHTML="<h3>🚗 مودها</h3>";
+main.innerHTML="<h3>Mods</h3>";
 
-mods.forEach((m,i)=>{
+let snap=await db.collection("mods").get();
+
+snap.forEach(doc=>{
+let m=doc.data();
+
 main.innerHTML+=`
-<div class="card">
+<div class="box">
 <b>${m.name}</b><br>
-💰 ${m.price==0?"Free":m.price+"$"}<br>
+💰 ${m.price}<br>
 
-<button onclick="buy(${i})">
-${m.price==0?"Download":"Buy"}
+<button onclick="download('${m.url}')">
+Download
 </button>
 </div>
 `;
 });
 }
 
-/* ================= BUY ================= */
+/* ================= DOWNLOAD ================= */
 
-function buy(i){
-
-if(mods[i].price==0){
-add(i);
-return;
+function download(url){
+window.open(url);
 }
 
-alert("خرید انجام شد (تستی)");
-add(i);
-}
+/* ================= ADMIN UPLOAD ================= */
 
-/* ================= ADD MOD ================= */
+function admin(){
 
-function add(i){
+app.innerHTML=`
+<h2>🧑‍💻 Admin Panel</h2>
 
-let users=JSON.parse(localStorage.getItem("users"));
-let u=JSON.parse(localStorage.getItem("user"));
+<div class="box">
+<input id="name" placeholder="name"><br>
+<input id="price" placeholder="price"><br>
+<input id="file" type="file"><br>
 
-users[u.email].mods.push(mods[i]);
-
-localStorage.setItem("users",JSON.stringify(users));
-localStorage.setItem("user",JSON.stringify(users[u.email]));
-
-alert("اضافه شد به حساب");
-}
-
-/* ================= MY MODS ================= */
-
-function myMods(){
-
-let u=JSON.parse(localStorage.getItem("user"));
-
-main.innerHTML="<h3>📥 My Mods</h3>";
-
-if(!u.mods.length){
-main.innerHTML+="<div class='card'>هیچی نداری</div>";
-return;
-}
-
-u.mods.forEach(m=>{
-main.innerHTML+=`
-<div class="card">
-${m.name}<br>
-<button onclick="window.open('${m.url}')">Download</button>
+<button onclick="upload()">Upload Mod</button>
 </div>
+<div id="main"></div>
 `;
+}
+
+async function upload(){
+
+let file=document.getElementById("file").files[0];
+
+let ref=storage.ref("mods/"+file.name);
+
+await ref.put(file);
+
+let url=await ref.getDownloadURL();
+
+await db.collection("mods").add({
+name:name.value,
+price:price.value,
+url:url
 });
+
+alert("آپلود شد");
+dashboard();
 }
 
 /* ================= LOGOUT ================= */
 
 function logout(){
-localStorage.removeItem("user");
-location.reload();
+auth.signOut().then(()=>loginPage());
 }
 
 /* ================= START ================= */
 
-if(user){
-dashboard();
-}else{
+auth.onAuthStateChanged(user=>{
+if(user) dashboard();
+else loginPage();
+});
+
 loginPage();
-}
 
 </script>
 
