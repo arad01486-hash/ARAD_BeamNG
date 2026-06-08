@@ -19,6 +19,7 @@ padding:15px;
 text-align:center;
 position:sticky;
 top:0;
+z-index:1000;
 }
 
 nav a{
@@ -34,153 +35,199 @@ text-align:center;
 background:linear-gradient(135deg,#0f172a,#1e293b);
 }
 
-header h1{
-font-size:60px;
-color:#00e5ff;
+h1{color:#00e5ff;font-size:55px}
+
+.btn{
+padding:10px 15px;
+background:#00e5ff;
+color:black;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+margin:10px;
 }
 
 .section{
 padding:40px 20px;
 }
 
-h2{
-color:#00e5ff;
-margin-bottom:20px;
-}
+h2{color:#00e5ff}
 
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:20px;
 }
 
 .card{
 background:#1e293b;
-padding:15px;
-border-radius:15px;
+padding:10px;
+border-radius:12px;
+transition:.3s;
 }
+
+.card:hover{transform:scale(1.05)}
 
 .card img{
 width:100%;
-height:160px;
-object-fit:cover;
 border-radius:10px;
 }
 
-.btn{
-display:block;
-margin-top:10px;
-padding:10px;
-background:#00e5ff;
-color:black;
-text-decoration:none;
-text-align:center;
-border-radius:10px;
-font-weight:bold;
+/* MODAL */
+.modal{
+display:none;
+position:fixed;
+top:0;left:0;
+width:100%;height:100%;
+background:rgba(0,0,0,0.8);
+justify-content:center;
+align-items:center;
 }
 
-.badge{
-background:#00e5ff;
-color:black;
-padding:3px 8px;
-border-radius:10px;
-font-size:12px;
-font-weight:bold;
-}
-
-.soon{
-color:#00e5ff;
-text-align:center;
-font-size:18px;
-margin-top:10px;
-}
-
-footer{
-text-align:center;
+.box{
+background:#1e293b;
 padding:20px;
-background:#111827;
-margin-top:30px;
+border-radius:15px;
+width:300px;
+text-align:center;
 }
+
+input{
+padding:10px;
+width:90%;
+margin:5px 0;
+border-radius:10px;
+border:none;
+}
+
+.hide{display:none !important}
 </style>
 </head>
 
 <body>
 
+<!-- NAV -->
 <nav>
+<a href="#home">خانه</a>
 <a href="#gallery">گالری</a>
-<a href="#free">مودهای رایگان</a>
-<a href="#paid">مودهای فروشی</a>
+<a href="#mods">مودها</a>
 <a href="#news">اخبار</a>
 </nav>
 
-<header>
+<!-- HERO -->
+<header id="home">
 <h1>ARAD BeamNG 🚗</h1>
-<p>مرجع مودهای حرفه‌ای BeamNG.drive</p>
+<p>سایت حرفه‌ای مود و شات BeamNG</p>
+
+<button class="btn" onclick="login()">ورود ادمین</button>
+<button class="btn hide" id="upBtn" onclick="openUpload()">📤 آپلود</button>
 </header>
 
-<section id="gallery" class="section">
+<!-- GALLERY -->
+<section class="section" id="gallery">
 <h2>🖼️ گالری</h2>
+<div class="grid" id="galleryBox"></div>
+</section>
+
+<!-- MODS -->
+<section class="section" id="mods">
+<h2>🆓 مودها</h2>
 
 <div class="grid">
-<div class="card">
-<img src="images/405.jpg">
-<h3>پژو 405 شوتی</h3>
-</div>
-
-<div class="card">
-<img src="images/bmw.jpg">
-<h3>BMW M5</h3>
-</div>
-
-<div class="card">
-<img src="images/nissan.jpg">
-<h3>نیسان آبی</h3>
-</div>
+<div class="card"><h3>پژو 405</h3></div>
+<div class="card"><h3>پراید اسپرت</h3></div>
 </div>
 </section>
 
-<section id="free" class="section">
-<h2>🆓 مودهای رایگان</h2>
-
-<div class="grid">
-
-<div class="card">
-<span class="badge">رایگان</span>
-<h3>405 معمولی</h3>
-<a class="btn" href="mods/405.zip" download>دانلود</a>
-</div>
-
-<div class="card">
-<span class="badge">رایگان</span>
-<h3>پراید اسپرت</h3>
-<a class="btn" href="mods/pride.zip" download>دانلود</a>
-</div>
-
-</div>
-</section>
-
-<section id="paid" class="section">
-<h2>💎 مودهای فروشی</h2>
-
-<div class="card">
-<h3>مود های  VIP</h3>
-<p class="soon">🚧 به زودی...</p>
-</div>
-
-</section>
-
-<section id="news" class="section">
+<!-- NEWS -->
+<section class="section" id="news">
 <h2>📢 اخبار</h2>
 
-<div class="card">
-<p>آخرین آپدیت سایت اینجا قرار می‌گیرد</p>
-</div>
-
+<div class="card">🔥 سایت ARAD BeamNG آنلاین شد</div>
+<div class="card">🚗 سیستم آپلود فعال شد</div>
 </section>
 
-<footer>
-ARAD BeamNG PRO © 2026
-</footer>
+<!-- UPLOAD -->
+<div class="modal" id="modal">
+<div class="box">
+
+<h3>📤 آپلود شات</h3>
+<input type="file" id="file">
+<button class="btn" onclick="upload()">آپلود</button>
+
+</div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB3OjZrgFVpfdayvDSOFB5f5OmChDj4tvo",
+  authDomain: "arad-beamng.firebaseapp.com",
+  projectId: "arad-beamng",
+  storageBucket: "arad-beamng.firebasestorage.app",
+  messagingSenderId: "259621342630",
+  appId: "1:259621342630:web:8640e6c867e38980abd367",
+  measurementId: "G-89MH9P5GZV"
+};
+
+initializeApp(firebaseConfig);
+</script>
+
+<script>
+let isAdmin=false;
+
+/* LOGIN */
+function login(){
+let pass=prompt("رمز ادمین:");
+
+if(pass==="1234"){
+alert("ادمین شدی 😎");
+isAdmin=true;
+document.getElementById("upBtn").classList.remove("hide");
+}else{
+alert("اشتباهه!");
+}
+}
+
+/* OPEN UPLOAD */
+function openUpload(){
+document.getElementById("modal").style.display="flex";
+}
+
+/* UPLOAD (فعلاً محلی + گالری) */
+function upload(){
+let file=document.getElementById("file").files[0];
+
+if(!file){
+alert("فایل انتخاب کن");
+return;
+}
+
+let reader=new FileReader();
+
+reader.onload=function(e){
+
+let div=document.createElement("div");
+div.className="card";
+
+div.innerHTML=`
+<img src="${e.target.result}">
+<p>${file.name}</p>
+`;
+
+document.getElementById("galleryBox").appendChild(div);
+
+alert("Upload Successful 🚀");
+};
+
+reader.readAsDataURL(file);
+
+document.getElementById("modal").style.display="none";
+}
+</script>
 
 </body>
 </html>
