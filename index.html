@@ -3,38 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD.BeamNG</title>
+<title>ARAD BeamNG PRO</title>
 
 <style>
-body{margin:0;font-family:tahoma;background:#0a0f1f;color:#fff;text-align:center}
-header{padding:60px;background:linear-gradient(135deg,#0f172a,#1e293b)}
-h1{color:#00e5ff}
-a{color:#00e5ff;text-decoration:none}
-.box{padding:20px;margin:20px;background:#1e293b;border-radius:15px}
+body{
+margin:0;
+font-family:tahoma;
+background:#0a0f1f;
+color:white;
+}
+
+header{
+padding:80px 20px;
+text-align:center;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+}
+
+header h1{
+font-size:60px;
+color:#00e5ff;
+}
+
+header p{
+color:#cbd5e1;
+}
+
+.search{
+margin-top:20px;
+}
+
+.search input{
+padding:12px;
+width:60%;
+max-width:400px;
+border-radius:10px;
+border:none;
+outline:none;
+}
+
+.section{
+padding:40px 20px;
+}
+
+h2{
+color:#00e5ff;
+margin-bottom:20px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:15px;
+transition:.3s;
+}
+
+.card:hover{
+transform:scale(1.05);
+}
+
+.card img{
+width:100%;
+height:160px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.btn{
+display:block;
+margin-top:10px;
+padding:10px;
+background:#00e5ff;
+color:black;
+text-decoration:none;
+text-align:center;
+border-radius:10px;
+font-weight:bold;
+}
+
+footer{
+text-align:center;
+padding:20px;
+background:#111827;
+margin-top:30px;
+color:#94a3b8;
+}
 </style>
 </head>
 
 <body>
 
 <header>
-<h1>ARAD.BeamNG 🚗</h1>
-<p>سایت مودهای BeamNG.drive</p>
+<h1>ARAD BeamNG 🚗</h1>
+<p>بهترین مودهای BeamNG.drive</p>
+
+<div class="search">
+<input type="text" placeholder="جستجوی مود...">
+</div>
 </header>
 
-<div class="box">
-<h2>🖼️ گالری</h2>
-<p>در حال بارگذاری مودها...</p>
+<section class="section">
+<h2>🖼️ گالری خودروها</h2>
+
+<div class="grid">
+
+<div class="card">
+<img src="images/405.jpg">
+<h3>پژو 405 شوتی</h3>
 </div>
 
-<div class="box">
-<h2>🆓 دانلود مود</h2>
-<a href="mods/405.zip" download>دانلود پژو 405</a>
+<div class="card">
+<img src="images/bmw.jpg">
+<h3>BMW M5</h3>
 </div>
 
-<div class="box">
-<h2>📢 اخبار</h2>
-<p>سایت در حال بروزرسانی است</p>
+<div class="card">
+<img src="images/nissan.jpg">
+<h3>نیسان آبی</h3>
 </div>
+
+</div>
+</section>
+
+<section class="section">
+<h2>🆓 مودهای دانلودی</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>پژو 405 مود</h3>
+<p>نسخه رایگان</p>
+<a class="btn" href="mods/405.zip" download>دانلود</a>
+</div>
+
+<div class="card">
+<h3>پراید اسپرت</h3>
+<p>نسخه رایگان</p>
+<a class="btn" href="mods/pride.zip" download>دانلود</a>
+</div>
+
+</div>
+
+</section>
+
+<footer>
+ARAD BeamNG PRO © 2026
+</footer>
 
 </body>
 </html>
