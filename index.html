@@ -4,30 +4,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARAD BeamNG Pro</title>
+<title>ARAD BeamNG PRO+</title>
 
 <style>
 body{margin:0;font-family:Arial;background:#0f0f0f;color:white}
 
 /* LOGIN */
 #loginPage{
-position:fixed;top:0;left:0;width:100%;height:100%;
+position:fixed;width:100%;height:100%;
 display:flex;justify-content:center;align-items:center;
-background:#000;z-index:9999;
+background:black;z-index:9999;
 }
 
 .box{
 background:#1c1c1c;padding:20px;border-radius:10px;
-text-align:center;box-shadow:0 0 20px #00c6ff;
+box-shadow:0 0 20px #00c6ff;text-align:center;
 }
 
-input,button{padding:10px;margin:5px;border-radius:8px;border:none}
+input,button{
+padding:10px;margin:5px;border-radius:8px;border:none;
+}
 
 button{background:#00c6ff;cursor:pointer;font-weight:bold}
 
-/* MAIN */
 .hidden{display:none}
 
+/* MAIN */
 header{
 background:linear-gradient(120deg,#00c6ff,#0072ff);
 text-align:center;padding:30px
@@ -40,21 +42,28 @@ gap:15px;padding:20px
 }
 
 .card{
-background:#1c1c1c;border-radius:10px;overflow:hidden
+background:#1c1c1c;border-radius:10px;overflow:hidden;
+padding:10px
 }
-
-.card img{width:100%;height:150px;object-fit:cover}
-
-.card-content{padding:10px}
 
 .btn{
 display:inline-block;background:#00c6ff;color:black;
-padding:8px;border-radius:6px;text-decoration:none
+padding:8px;border-radius:6px;text-decoration:none;
+margin-top:5px
+}
+
+.small{
+font-size:12px;opacity:0.7
 }
 
 /* ADMIN */
 #adminPanel{
 background:#111;padding:15px;margin:20px;border-radius:10px;
+display:none;
+}
+
+.like{
+cursor:pointer;color:red;font-weight:bold
 }
 </style>
 
@@ -81,16 +90,14 @@ background:#111;padding:15px;margin:20px;border-radius:10px;
 
 <header>
 <h1>ARAD BeamNG Mods</h1>
-<p>سیستم حرفه‌ای مود + آپلود</p>
+<p>PRO System + Users + Likes</p>
 </header>
 
-<!-- ADMIN UPLOAD -->
-
 <div id="adminPanel">
-<h3>Upload Mod (Admin)</h3>
-<input id="modName" placeholder="Name">
-<input id="modFile" placeholder="File URL">
-<button onclick="addMod()">Add</button>
+<h3>🔐 Admin Panel</h3>
+<input type="file" id="file"><br>
+<input id="modName" placeholder="Mod Name"><br>
+<button onclick="uploadMod()">Upload</button>
 </div>
 
 <div class="container" id="mods"></div>
@@ -108,11 +115,12 @@ background:#111;padding:15px;margin:20px;border-radius:10px;
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
 <script>
-// 🔥 Firebase Config (اینو باید خودت پر کنی)
+
+// 🔥 Firebase Config
 const firebaseConfig = {
 apiKey: "YOUR_API_KEY",
 authDomain: "YOUR_DOMAIN",
-projectId: "YOUR_ID",
+projectId: "YOUR_PROJECT",
 storageBucket: "YOUR_BUCKET"
 };
 
@@ -120,6 +128,13 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
+
+// 🔐 ADMIN PASSWORD (جدا از ایمیل)
+const ADMIN_PASS = "12345ARAD";
+
+// 👤 current user
+let currentUser = null;
 
 /* REGISTER */
 function register(){
@@ -127,7 +142,10 @@ let email=document.getElementById("email").value;
 let pass=document.getElementById("pass").value;
 
 auth.createUserWithEmailAndPassword(email,pass)
-.then(()=>document.getElementById("msg").innerText="Registered!")
+.then(u=>{
+currentUser = u.user;
+document.getElementById("msg").innerText="Registered!";
+})
 .catch(e=>document.getElementById("msg").innerText=e.message);
 }
 
@@ -137,43 +155,86 @@ let email=document.getElementById("email").value;
 let pass=document.getElementById("pass").value;
 
 auth.signInWithEmailAndPassword(email,pass)
-.then(()=>{
+.then(u=>{
+currentUser = u.user;
+
 document.getElementById("loginPage").style.display="none";
 document.getElementById("main").classList.remove("hidden");
+
+if(prompt("Admin Password?") === ADMIN_PASS){
+document.getElementById("adminPanel").style.display="block";
+}
+
 loadMods();
 })
 .catch(e=>document.getElementById("msg").innerText=e.message);
 }
 
-/* ADD MOD (ADMIN ONLY) */
-function addMod(){
+/* UPLOAD MOD */
+function uploadMod(){
+let file=document.getElementById("file").files[0];
 let name=document.getElementById("modName").value;
-let file=document.getElementById("modFile").value;
+
+let ref=storage.ref("mods/"+file.name);
+
+ref.put(file).then(snap=>{
+snap.ref.getDownloadURL().then(url=>{
 
 db.collection("mods").add({
 name:name,
-file:file
+file:url,
+likes:0,
+downloads:0
+});
+
+loadMods();
+});
+});
+}
+
+/* LIKE */
+function likeMod(id,likes){
+db.collection("mods").doc(id).update({
+likes: likes + 1
 });
 loadMods();
+}
+
+/* DOWNLOAD COUNT */
+function downloadMod(id,url){
+db.collection("mods").doc(id).get().then(doc=>{
+let d = doc.data();
+
+db.collection("mods").doc(id).update({
+downloads: d.downloads + 1
+});
+
+window.open(url,"_blank");
+});
 }
 
 /* LOAD MODS */
 function loadMods(){
 document.getElementById("mods").innerHTML="";
+
 db.collection("mods").get().then(snap=>{
 snap.forEach(doc=>{
 let m=doc.data();
 
 document.getElementById("mods").innerHTML+=`
 <div class="card">
-<div class="card-content">
 <h3>${m.name}</h3>
-<a class="btn" href="${m.file}" target="_blank">Download</a>
-</div>
+
+<a class="btn" onclick="downloadMod('${doc.id}','${m.file}')">Download</a>
+
+<p class="small">❤️ ${m.likes || 0} | ⬇ ${m.downloads || 0}</p>
+
+<span class="like" onclick="likeMod('${doc.id}',${m.likes || 0})">❤️ Like</span>
 </div>`;
 });
 });
 }
+
 </script>
 
 </body>
